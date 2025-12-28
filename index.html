@@ -1,77 +1,40 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Prep + Quality Checklist (AM/PM)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Kitchen Execution Checklist</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="top">
-    <div class="brand">
-      <h1>Prep + Quality Checklist</h1>
-      <p class="sub">One checkbox per row + temps where needed + photos → Submit downloads PDF.</p>
-    </div>
 
-    <div class="tabs" role="tablist" aria-label="Shift tabs">
-      <button class="tab active" data-shift="am" role="tab" aria-selected="true">AM Shift</button>
-      <button class="tab" data-shift="pm" role="tab" aria-selected="false">PM Shift</button>
-    </div>
-  </header>
+<header class="top">
+  <h1>Daily Kitchen Execution Checklist</h1>
+  <div class="tabs">
+    <button class="tab active" data-shift="am">AM Shift</button>
+    <button class="tab" data-shift="pm">PM Shift</button>
+  </div>
+</header>
 
-  <main class="wrap">
-    <section class="meta">
-      <div class="field">
-        <label for="manager">Manager Name</label>
-        <input id="manager" placeholder="Name" />
-      </div>
-      <div class="field">
-        <label for="store">Store</label>
-        <input id="store" placeholder="Store / Location" />
-      </div>
-      <div class="field">
-        <label for="date">Date</label>
-        <input id="date" type="date" />
-      </div>
-      <div class="field">
-        <label for="time">Time</label>
-        <input id="time" type="time" />
-      </div>
-    </section>
+<main class="wrap">
 
-    <section class="card">
-      <div class="cardHead">
-        <h2>Equipment Temps (quick)</h2>
-        <span class="hint">Optional</span>
-      </div>
-      <div class="grid2">
-        <div class="field">
-          <label for="equip1">Temps / Notes</label>
-          <input id="equip1" placeholder="Example: Fryer 355°F, salad cooler 38°F, freezer -2°F..." />
-        </div>
-        <div class="field">
-          <label for="equip2">Issues / Follow-up</label>
-          <input id="equip2" placeholder="Example: Station 2 cooler thermometer missing" />
-        </div>
-      </div>
-    </section>
+<section class="meta">
+  <input id="manager" placeholder="Manager Name">
+  <input id="store" placeholder="Store / Location">
+  <input id="date" type="date">
+  <input id="time" type="time">
+</section>
 
-    <div id="progress" class="progress" aria-live="polite"></div>
+<div id="sections"></div>
 
-    <section id="sections" class="sections"></section>
+<section class="submitBox">
+  <button id="submitBtn">Submit & Download PDF</button>
+  <p class="hint">PDF will open → Share → Save to Files (iPhone)</p>
+</section>
 
-    <section class="submitBox">
-      <button id="submitBtn" class="submit">Submit & Download PDF</button>
-      <div class="rowBtns">
-        <button id="resetShiftBtn" class="ghost">Reset Current Shift</button>
-        <button id="resetAllBtn" class="ghost danger">Reset ALL</button>
-      </div>
-      <p class="tiny">iPhone: PDF may open in preview → Share → Save to Files.</p>
-      <div id="status" class="status" aria-live="polite"></div>
-    </section>
-  </main>
+</main>
 
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
