@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Quality Check (AM/PM) + PDF</title>
+  <title>Prep + Quality Checklist (AM/PM)</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="top">
     <div class="brand">
-      <h1>Quality Check</h1>
-      <p class="sub">AM/PM checks • Appearance / Taste / Temp • Photos • Submit downloads a PDF</p>
+      <h1>Prep + Quality Checklist</h1>
+      <p class="sub">One checkbox per row + temps where needed + photos → Submit downloads PDF.</p>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Shift tabs">
-      <button class="tab active" data-shift="am" role="tab" aria-selected="true">AM</button>
-      <button class="tab" data-shift="pm" role="tab" aria-selected="false">PM</button>
+      <button class="tab active" data-shift="am" role="tab" aria-selected="true">AM Shift</button>
+      <button class="tab" data-shift="pm" role="tab" aria-selected="false">PM Shift</button>
     </div>
   </header>
 
@@ -23,31 +23,50 @@
     <section class="meta">
       <div class="field">
         <label for="manager">Manager Name</label>
-        <input id="manager" placeholder="Manager name" />
+        <input id="manager" placeholder="Name" />
+      </div>
+      <div class="field">
+        <label for="store">Store</label>
+        <input id="store" placeholder="Store / Location" />
       </div>
       <div class="field">
         <label for="date">Date</label>
         <input id="date" type="date" />
       </div>
       <div class="field">
-        <label for="store">Store / Location (optional)</label>
-        <input id="store" placeholder="e.g., Wilmington - Market St" />
-      </div>
-      <div class="field">
-        <label for="time">Time (optional)</label>
+        <label for="time">Time</label>
         <input id="time" type="time" />
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead">
+        <h2>Equipment Temps (quick)</h2>
+        <span class="hint">Optional</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="equip1">Temps / Notes</label>
+          <input id="equip1" placeholder="Example: Fryer 355°F, salad cooler 38°F, freezer -2°F..." />
+        </div>
+        <div class="field">
+          <label for="equip2">Issues / Follow-up</label>
+          <input id="equip2" placeholder="Example: Station 2 cooler thermometer missing" />
+        </div>
       </div>
     </section>
 
     <div id="progress" class="progress" aria-live="polite"></div>
 
-    <section id="checklist" class="checklist"></section>
+    <section id="sections" class="sections"></section>
 
     <section class="submitBox">
-      <button id="submitBtn" class="submit" disabled>Submit & Download PDF</button>
-      <p class="tiny">
-        iPhone tip: Safari may open a PDF preview → tap Share → Save to Files.
-      </p>
+      <button id="submitBtn" class="submit">Submit & Download PDF</button>
+      <div class="rowBtns">
+        <button id="resetShiftBtn" class="ghost">Reset Current Shift</button>
+        <button id="resetAllBtn" class="ghost danger">Reset ALL</button>
+      </div>
+      <p class="tiny">iPhone: PDF may open in preview → Share → Save to Files.</p>
       <div id="status" class="status" aria-live="polite"></div>
     </section>
   </main>
