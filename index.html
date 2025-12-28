@@ -1,1 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quality Check (AM/PM) + PDF</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <h1>Quality Check</h1>
+      <p class="sub">AM/PM checks • Appearance / Taste / Temp • Photos • Submit downloads a PDF</p>
+    </div>
 
+    <div class="tabs" role="tablist" aria-label="Shift tabs">
+      <button class="tab active" data-shift="am" role="tab" aria-selected="true">AM</button>
+      <button class="tab" data-shift="pm" role="tab" aria-selected="false">PM</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="meta">
+      <div class="field">
+        <label for="manager">Manager Name</label>
+        <input id="manager" placeholder="Manager name" />
+      </div>
+      <div class="field">
+        <label for="date">Date</label>
+        <input id="date" type="date" />
+      </div>
+      <div class="field">
+        <label for="store">Store / Location (optional)</label>
+        <input id="store" placeholder="e.g., Wilmington - Market St" />
+      </div>
+      <div class="field">
+        <label for="time">Time (optional)</label>
+        <input id="time" type="time" />
+      </div>
+    </section>
+
+    <div id="progress" class="progress" aria-live="polite"></div>
+
+    <section id="checklist" class="checklist"></section>
+
+    <section class="submitBox">
+      <button id="submitBtn" class="submit" disabled>Submit & Download PDF</button>
+      <p class="tiny">
+        iPhone tip: Safari may open a PDF preview → tap Share → Save to Files.
+      </p>
+      <div id="status" class="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
