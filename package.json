@@ -1,5 +1,5 @@
 {
-  "name": "quality-check-pdf",
+  "name": "kitchen-execution-checklist",
   "version": "1.0.0",
   "type": "module",
   "main": "server.js",
