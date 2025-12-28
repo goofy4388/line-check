@@ -334,3 +334,70 @@ document.querySelectorAll(".tab").forEach(btn => {
   $("#time").value = now.toTimeString().slice(0,5);
   render();
 })();
+/* ============================
+   PDF GENERATION
+============================ */
+
+submitBtn.onclick = async () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "pt", format: "letter" });
+
+  const margin = 40;
+  let y = margin;
+
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+
+  const ensureSpace = h => {
+    if (y + h > pageH - margin) {
+      doc.addPage();
+      y = margin;
+    }
+  };
+
+  // HEADER
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("Daily Kitchen Execution Checklist", margin, y);
+  y += 20;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(`Shift: ${shift.toUpperCase()}`, margin, y); y += 14;
+  doc.text(`Manager: ${$("#manager").value}`, margin, y); y += 14;
+  doc.text(`Store: ${$("#store").value}`, margin, y); y += 14;
+  doc.text(`Date: ${$("#date").value}   Time: ${$("#time").value}`, margin, y); y += 20;
+
+  // SECTIONS
+  for (const sec of CHECKLIST) {
+    ensureSpace(30);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text(sec.title, margin, y);
+    y += 14;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+
+    const rows = state[shift][sec.title];
+
+    for (const r of rows) {
+      ensureSpace(18);
+
+      const line =
+        `${r.done ? "✅" : "⬜"} ${r.item}` +
+        (r.note ? ` — ${r.note}` : "");
+
+      doc.text(line, margin, y);
+      y += 14;
+    }
+
+    y += 10;
+  }
+
+  // SAVE
+  const filename =
+    `Kitchen_Checklist_${shift.toUpperCase()}_${$("#date").value}.pdf`;
+
+  doc.save(filename);
+};
