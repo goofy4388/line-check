@@ -5,5 +5,5 @@ app.use(express.static("."));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Running: http://localhost:${PORT}`);
+  console.log(`Running at http://localhost:${PORT}`);
 });
