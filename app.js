@@ -1,3 +1,8 @@
+const sectionsEl = $("#sections");
+
+if (!sectionsEl) {
+  alert("ERROR: <div id='sections'> not found or JS loaded too early");
+}
 /* =========================================================
    DAILY KITCHEN EXECUTION (LINE CHECK) - PERFECT VERSION
    - AM/PM tabs
@@ -396,16 +401,17 @@ function resetAll(){
   $("#store").value = "";
   $("#equipNotes").value = "";
   $("#issues").value = "";
-
+/* ============================
+   INIT (wait for DOM)
+============================ */
+window.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
   $("#date").value = now.toISOString().slice(0,10);
   $("#time").value = now.toTimeString().slice(0,5);
-
-  pdfIncludeAllEl.checked = false;
-  pdfEmbedPhotosEl.checked = false;
-
   render();
-}
+});
+  
+
 
 resetShiftBtn.addEventListener("click", resetCurrentShift);
 resetAllBtn.addEventListener("click", resetAll);
