@@ -9,8 +9,15 @@ body{ margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont; backgrou
 .top h1{ margin:0 0 6px; font-size:18px; }
 .sub{ margin:0; opacity:.8; font-size:12px; }
 
+.navLinks{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.navLink{
+  color:#cfe6ff; text-decoration:none; font-size:13px;
+  padding:8px 10px; border:1px solid #334; border-radius:10px; background:#111626;
+}
+.navLink.active{ border-color:#4da3ff; }
+
 .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
-.tab{ padding:8px 12px; background:#222; border:1px solid #444; color:#fff; border-radius:10px; }
+.tab{ padding:8px 12px; background:#222; border:1px solid #444; color:#fff; border-radius:10px; cursor:pointer; }
 .tab.active{ border-color:#4da3ff; }
 
 .wrap{ padding:16px; max-width:1400px; margin:auto; }
@@ -40,6 +47,16 @@ body{ margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont; backgrou
 
 .opt{ font-size:13px; opacity:.9; display:flex; align-items:center; gap:8px; }
 
+.debug{
+  display:none;
+  margin: 0 0 14px;
+  padding:10px 12px;
+  border:1px solid #ff5b5b;
+  border-radius:12px;
+  background:#1a1212;
+  font-size:13px;
+}
+
 .section{
   margin-top:16px;
   border:1px solid #333;
@@ -64,12 +81,8 @@ body{ margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont; backgrou
   margin-bottom:8px;
 }
 
-.row{
-  padding:8px 0;
-  border-bottom:1px solid #232323;
-}
+.row{ padding:8px 0; border-bottom:1px solid #232323; }
 .row:last-child{ border-bottom:none; }
-
 .row input[type="checkbox"]{ transform:scale(1.25); }
 
 .itemText{ font-size:13px; }
@@ -84,10 +97,10 @@ body{ margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont; backgrou
   width:100%;
   box-sizing:border-box;
 }
-
-.photo{ font-size:12px; }
+.photo{ font-size:12px; width:100%; }
 
 .submitBox{ margin:24px 0; }
+
 button{
   padding:12px;
   border-radius:12px;
@@ -98,41 +111,19 @@ button{
   font-size:15px;
 }
 
-.btnRow{
-  display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;
-}
-.btnRow button{
-  width:auto; flex:1; border:1px solid #444;
-}
+.btnRow{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.btnRow button{ width:auto; flex:1; border:1px solid #444; }
 .danger{ border-color:#ff5b5b !important; }
 
 .hint{ opacity:.75; font-size:12px; margin-top:10px; }
 .status{ margin-top:10px; font-size:13px; }
 .status.ok{ color:#55dd88; }
 .status.err{ color:#ff5b5b; }
-/* Mobile friendliness: stack columns on small screens */
+
+/* Mobile readable */
 @media (max-width: 900px){
-  .legend{ display:none; } /* legend too wide on phones */
-  .row{
-    grid-template-columns: 40px 1fr; /* checkbox + main area */
-    gap:10px;
-    padding:12px 0;
-  }
-
-  /* make the "extra fields" wrap nicely under the item */
-  .row .muted,
-  .row .note,
-  .row .photo{
-    grid-column: 2 / -1;
-  }
-
-  .itemText{
-    font-size:14px;
-    font-weight:600;
-  }
-}
-
-/* Make file input behave nicer on iPhone */
-.photo{
-  width:100%;
+  .legend{ display:none; }
+  .row{ grid-template-columns: 40px 1fr; gap:10px; padding:12px 0; }
+  .row .muted, .row .note, .row .photo{ grid-column: 2 / -1; }
+  .itemText{ font-size:14px; font-weight:600; }
 }
