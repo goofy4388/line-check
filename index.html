@@ -1,37 +1,69 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daily Kitchen Execution Checklist</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daily Kitchen Execution (Line Check)</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
 <header class="top">
-  <h1>Daily Kitchen Execution Checklist</h1>
+  <div>
+    <h1>Daily Kitchen Execution (Line Check)</h1>
+    <p class="sub">1 checkbox per item + keep utensil/life/target temp + notes/photos. Submit downloads PDF.</p>
+  </div>
+
   <div class="tabs">
-    <button class="tab active" data-shift="am">AM Shift</button>
-    <button class="tab" data-shift="pm">PM Shift</button>
+    <button class="tab active" data-shift="am" type="button">AM Shift</button>
+    <button class="tab" data-shift="pm" type="button">PM Shift</button>
   </div>
 </header>
 
 <main class="wrap">
+  <section class="meta">
+    <div class="field">
+      <label>Manager Name</label>
+      <input id="manager" placeholder="Manager name" />
+    </div>
+    <div class="field">
+      <label>Store</label>
+      <input id="store" placeholder="Store / Location" />
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input id="date" type="date" />
+    </div>
+    <div class="field">
+      <label>Time</label>
+      <input id="time" type="time" />
+    </div>
+  </section>
 
-<section class="meta">
-  <input id="manager" placeholder="Manager Name">
-  <input id="store" placeholder="Store / Location">
-  <input id="date" type="date">
-  <input id="time" type="time">
-</section>
+  <section class="meta">
+    <div class="field">
+      <label>Equipment Temps / Notes (optional)</label>
+      <input id="equipNotes" placeholder='Example: Fryer 355°F, cooler 38°F, freezer -2°F…' />
+    </div>
+    <div class="field">
+      <label>Issues / Follow-up (optional)</label>
+      <input id="issues" placeholder="Example: Station 2 cooler thermometer missing" />
+    </div>
+  </section>
 
-<div id="sections"></div>
+  <div id="sections"></div>
 
-<section class="submitBox">
-  <button id="submitBtn">Submit & Download PDF</button>
-  <p class="hint">PDF will open → Share → Save to Files (iPhone)</p>
-</section>
+  <section class="submitBox">
+    <button id="submitBtn" type="button">Submit & Download PDF</button>
 
+    <div class="btnRow">
+      <button id="resetShiftBtn" type="button">Reset Current Shift</button>
+      <button id="resetAllBtn" type="button" class="danger">Reset ALL</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <p class="hint">iPhone: PDF opens → Share → Save to Files.</p>
+  </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
