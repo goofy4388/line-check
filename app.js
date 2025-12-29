@@ -1,11 +1,11 @@
 /* =========================================================
-   DAILY KITCHEN EXECUTION (LINE CHECK)
+   DAILY KITCHEN EXECUTION (LINE CHECK) - PERFECT VERSION
    - AM/PM tabs
    - 1 checkbox per item (Executed)
-   - Keeps: Item + Utensil + Shelf Life + Target Temp
+   - Shows: Item + Utensil + Shelf Life + Target Temp
    - Note + Photo per item
-   - Submit => PDF download
-   - Reset shift / reset all
+   - PDF defaults FAST: only items that matter; no photo embed
+   - Reset Shift + Reset All
 ========================================================= */
 
 const $ = (s) => document.querySelector(s);
@@ -15,21 +15,23 @@ const submitBtn = $("#submitBtn");
 const resetShiftBtn = $("#resetShiftBtn");
 const resetAllBtn = $("#resetAllBtn");
 const statusEl = $("#status");
+const pdfIncludeAllEl = $("#pdfIncludeAll");
+const pdfEmbedPhotosEl = $("#pdfEmbedPhotos");
 
 let shift = "am";
 
 const it = (item, utensil="", life="", target="") => ({ item, utensil, life, target });
 
-// ✅ Your “Daily Kitchen Execution” list
-// (This is the same structure we used before. You can edit the text anytime.)
+/* ============================
+   FULL CHECKLIST (from your sheets)
+============================ */
 const CHECKLIST = [
-  const CHECKLIST = [
   { title:"APPS", rows:[
     it("Sanitizer Bucket","Test strips","2 HR",""),
     it("Lemons, Wedges","","1 DAY",""),
     it("Salt & Black Pepper","","1 DAY",""),
     it("French Fries","8 WT OZ","FROZEN",""),
-    it("Rosemary Parm Seasoning","Shaker","3 DAYS",""),
+    it("Rosemary Parm Seasoning","SHAKER","3 DAYS",""),
     it("Zucchini","6 WT OZ","2 DAYS",""),
     it("Calamari in Brine","4 OZ SPOODLE","2 DAYS",""),
     it("Calamari Batter","1 CUP","1 DAY",""),
@@ -58,7 +60,7 @@ const CHECKLIST = [
     it("Sausage Arancini","6 EACH","2 DAYS",""),
     it("Spinach Arancini","8 EACH","2 DAYS",""),
     it("Marinara Sauce (Hot)","3 OZ LADLE","4 DAYS",""),
-    it("Mezzaluna Fritte","4 EACH + 8 EACH","1 DAYS",""),
+    it("Mezzaluna Fritte","4 EACH + 8 EACH","1 DAY",""),
     it("Sugo Rosa Sauce","2 OZ + 3 OZ LADLE","2 DAYS",""),
     it("Crab Cakes","2 EACH","2 DAYS",""),
     it("Gorgonzola Sauce","1½ OZ LADLE","4 DAYS",""),
@@ -267,14 +269,18 @@ const CHECKLIST = [
   ]}
 ];
 
-// STATE
+/* ============================
+   STATE
+============================ */
 const state = { am:{}, pm:{} };
 for (const sec of CHECKLIST) {
   state.am[sec.title] = sec.rows.map(r => ({ ...r, done:false, note:"", photo:null }));
   state.pm[sec.title] = sec.rows.map(r => ({ ...r, done:false, note:"", photo:null }));
 }
 
-// RENDER
+/* ============================
+   RENDER
+============================ */
 function render(){
   sectionsEl.innerHTML = "";
 
@@ -346,7 +352,9 @@ function render(){
   }
 }
 
-// TABS
+/* ============================
+   TABS
+============================ */
 document.querySelectorAll(".tab").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
@@ -356,9 +364,11 @@ document.querySelectorAll(".tab").forEach(btn=>{
   });
 });
 
-// RESETS
+/* ============================
+   RESET
+============================ */
 function resetCurrentShift(){
-  if (!confirm(`Reset ${shift.toUpperCase()} shift?`)) return;
+  if (!confirm(`Reset ${shift.toUpperCase()} shift checklist?`)) return;
   for (const sec of CHECKLIST) {
     for (const row of state[shift][sec.title]) {
       row.done = false;
@@ -391,13 +401,23 @@ function resetAll(){
   $("#date").value = now.toISOString().slice(0,10);
   $("#time").value = now.toTimeString().slice(0,5);
 
+  pdfIncludeAllEl.checked = false;
+  pdfEmbedPhotosEl.checked = false;
+
   render();
 }
 
 resetShiftBtn.addEventListener("click", resetCurrentShift);
 resetAllBtn.addEventListener("click", resetAll);
 
-// PDF HELPERS
+/* ============================
+   PDF HELPERS
+============================ */
+function setStatus(msg, ok=null){
+  statusEl.className = "status" + (ok===true ? " ok" : ok===false ? " err" : "");
+  statusEl.textContent = msg;
+}
+
 function fileToDataUrl(file){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
@@ -407,12 +427,16 @@ function fileToDataUrl(file){
   });
 }
 
-// PDF
+/* ============================
+   SUBMIT => PDF (FAST by default)
+============================ */
 submitBtn.addEventListener("click", async ()=>{
-  statusEl.className = "status";
-  statusEl.textContent = "Building PDF…";
-
   try{
+    setStatus("Building PDF…");
+
+    const includeAll = pdfIncludeAllEl.checked;
+    const embedPhotos = pdfEmbedPhotosEl.checked; // slow on purpose
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit:"pt", format:"letter" });
 
@@ -433,62 +457,96 @@ submitBtn.addEventListener("click", async ()=>{
     const equipNotes = $("#equipNotes").value || "";
     const issues = $("#issues").value || "";
 
+    // Header
     doc.setFont("helvetica","bold"); doc.setFontSize(15);
     doc.text(`Daily Kitchen Execution — ${shift.toUpperCase()}`, margin, y); y += 18;
 
     doc.setFont("helvetica","normal"); doc.setFontSize(10);
-    const header = [
+    const headerParts = [
       manager ? `Manager: ${manager}` : "",
       store ? `Store: ${store}` : "",
       `Date: ${date}  Time: ${time}`,
       equipNotes ? `Equipment: ${equipNotes}` : "",
       issues ? `Issues: ${issues}` : ""
-    ].filter(Boolean).join("   |   ");
+    ].filter(Boolean);
 
-    const wrapped = doc.splitTextToSize(header, maxW);
-    doc.text(wrapped, margin, y);
-    y += wrapped.length * 12 + 10;
+    const header = headerParts.join("   |   ");
+    const wrappedHeader = doc.splitTextToSize(header, maxW);
+    doc.text(wrappedHeader, margin, y);
+    y += wrappedHeader.length * 12 + 10;
 
+    // Count “included” rows to show progress
+    const rowsToPrint = [];
     for (const sec of CHECKLIST) {
+      for (const row of state[shift][sec.title]) {
+        const matters = row.done || (row.note && row.note.trim()) || row.photo;
+        if (includeAll || matters) rowsToPrint.push({ sec: sec.title, row });
+      }
+    }
+
+    if (!rowsToPrint.length) {
+      setStatus("Nothing marked. Check at least one item (or add a note/photo) to generate a PDF.", false);
+      return;
+    }
+
+    // Print sections
+    let photoCount = 0;
+    for (const sec of CHECKLIST) {
+      // collect rows for this section
+      const secRows = state[shift][sec.title].filter(r => includeAll || r.done || (r.note && r.note.trim()) || r.photo);
+      if (!secRows.length) continue;
+
       ensure(24);
       doc.setFont("helvetica","bold"); doc.setFontSize(12);
-      doc.text(sec.title, margin, y); y += 12;
+      doc.text(sec.title, margin, y); y += 14;
 
       doc.setFont("helvetica","normal"); doc.setFontSize(9);
-      const headerRow = "Exec  Item  | Utensil | Life | Target | Note";
-      doc.text(headerRow, margin, y); y += 12;
+      doc.text("Exec | Item | Utensil | Life | Target | Note | Photo", margin, y);
+      y += 12;
 
-      for (const row of state[shift][sec.title]) {
+      for (const row of secRows) {
+        const photoFlag = row.photo ? "YES" : "NO";
         const prefix = row.done ? "✅" : "⬜";
-        const line = `${prefix} ${row.item} | ${row.utensil || "—"} | ${row.life || "—"} | ${row.target || "—"}${row.note ? " | " + row.note : ""}`;
+
+        const line =
+          `${prefix} | ${row.item} | ${row.utensil || "—"} | ${row.life || "—"} | ${row.target || "—"} | ${row.note || ""} | ${photoFlag}`;
+
         const lines = doc.splitTextToSize(line, maxW);
         ensure(lines.length * 12 + 6);
         doc.text(lines, margin, y);
         y += lines.length * 12 + 2;
 
-        if (row.photo) {
+        // Optional: embed photo (slow by design)
+        if (embedPhotos && row.photo) {
+          photoCount++;
+          setStatus(`Embedding photo ${photoCount}… (this is slow by design)`);
           const dataUrl = await fileToDataUrl(row.photo);
-          ensure(120);
-          doc.addImage(dataUrl, "JPEG", margin, y, 160, 110);
-          y += 115;
+
+          ensure(140);
+          doc.setFont("helvetica","italic"); doc.setFontSize(9);
+          doc.text("Photo:", margin, y);
+          y += 10;
+          doc.addImage(dataUrl, "JPEG", margin, y, 200, 140);
+          y += 150;
+          doc.setFont("helvetica","normal"); doc.setFontSize(9);
         }
       }
 
-      y += 8;
+      y += 10;
     }
 
     const safeStore = (store || "Store").replace(/[^a-z0-9]+/gi,"-");
     doc.save(`LineCheck-${shift.toUpperCase()}-${safeStore}-${date || "date"}.pdf`);
 
-    statusEl.className = "status ok";
-    statusEl.textContent = "PDF downloaded.";
+    setStatus("PDF downloaded.", true);
   } catch (e) {
-    statusEl.className = "status err";
-    statusEl.textContent = `PDF Error: ${e?.message || e}`;
+    setStatus(`PDF Error: ${e?.message || e}`, false);
   }
 });
 
-// INIT
+/* ============================
+   INIT
+============================ */
 (() => {
   const now = new Date();
   $("#date").value = now.toISOString().slice(0,10);
