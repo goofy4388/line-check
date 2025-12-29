@@ -1,35 +1,36 @@
+/* =========================================================
+   Line Check (Daily Kitchen Execution)
+========================================================= */
 const $ = (s) => document.querySelector(s);
 
-function showDebug(msg) {
-  const d = document.getElementById("debug");
-  if (d) {
-    d.style.display = "block";
-    d.innerHTML = msg;
-  }
+function showDebug(html) {
+  const d = $("#debug");
+  if (!d) return;
+  d.style.display = "block";
+  d.innerHTML = html;
 }
 
 window.addEventListener("error", (e) => {
-  showDebug(`<b>JS ERROR:</b> ${e.message || e}<br><small>${e.filename || ""} : ${e.lineno || ""}</small>`);
+  showDebug(`<b>JS ERROR:</b> ${e.message || e}<br><small>${e.filename || ""}:${e.lineno || ""}</small>`);
 });
-/* =========================================================
-   DAILY KITCHEN EXECUTION (LINE CHECK) - FIXED VERSION
-   - AM/PM tabs
-   - 1 checkbox per item (Executed)
-   - Shows: Item + Utensil + Shelf Life + Target Temp
-   - Note + Photo per item
-   - PDF defaults FAST: only items that matter; no photo embed
-   - Reset Shift + Reset All
-========================================================= */
 
-const $ = (s) => document.querySelector(s);
+function must(id){
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Missing element #${id} in HTML`);
+  return el;
+}
+
+const sectionsEl = must("sections");
+const submitBtn = must("submitBtn");
+const resetShiftBtn = must("resetShiftBtn");
+const resetAllBtn = must("resetAllBtn");
+const statusEl = must("status");
+const pdfIncludeAllEl = must("pdfIncludeAll");
+const pdfEmbedPhotosEl = must("pdfEmbedPhotos");
 
 let shift = "am";
+const it = (item, utensil="", life="", target="") => ({ item, utensil, life, target });
 
-const it = (item, utensil = "", life = "", target = "") => ({ item, utensil, life, target });
-
-/* ============================
-   FULL CHECKLIST (from your sheets)
-============================ */
 const CHECKLIST = [
   { title:"APPS", rows:[
     it("Sanitizer Bucket","Test strips","2 HR",""),
@@ -74,7 +75,6 @@ const CHECKLIST = [
     it("Gorgonzola Cheese","1½ OZ LADLE","4 DAYS",""),
     it("Short Rib","","4 DAYS","")
   ]},
-
   { title:"SALAD", rows:[
     it("Sanitizer Bucket","Test strips","2 HR",""),
     it("Roasted Red Peppers","½\" x 1½\" strips","3 DAYS","41°F or less"),
@@ -99,14 +99,12 @@ const CHECKLIST = [
     it("Caesar Dressing","1½ OZ LADLE","6 DAYS","41°F or less"),
     it("Vinaigrette Dressing","1½ OZ LADLE","4 DAYS","41°F or less")
   ]},
-
   { title:"ALTO SHAAM & STEAM WELL", rows:[
     it("Chicken Soup (150°)","8 OZ LADLE","4 HR","150°F"),
     it("Soup of the Day (150°)","8 OZ LADLE","4 HR","150°F"),
     it("Marinara Sauce (150°)","3 OZ LADLE","4 HR","150°F"),
     it("Pomodoro Sauce (150°)","2 & 4 OZ LADLES","4 HR","150°F")
   ]},
-
   { title:"MERRY CHEF", rows:[
     it("Spiedino Breading","1 TEASPOON","4 DAYS",""),
     it("Stuffed Mushrooms","","3 DAYS",""),
@@ -115,7 +113,6 @@ const CHECKLIST = [
     it("Meatballs","TONGS","4 DAYS",""),
     it("Pomodoro","2 & 4 OZ LADLES","4 DAYS","")
   ]},
-
   { title:"TENDER SHACK", rows:[
     it("Pickles","TONGS","3 DAYS","41°F or less"),
     it("Shredded Romaine","½ MEASURING CUP","2 DAYS","41°F or less"),
@@ -133,7 +130,6 @@ const CHECKLIST = [
     it("Sauce, BBQ","1½ OZ PORTIONS","7 DAYS","41°F or less"),
     it("Nash, Hot Seasoning","SHAKER TSP & TBS","14 DAYS","")
   ]},
-
   { title:"DESSERTS", rows:[
     it("Mint Sprigs","","1 DAY",""),
     it("Powdered Sugar","SHAKER/FINE LID","1 DAY",""),
@@ -154,7 +150,6 @@ const CHECKLIST = [
     it("Peanut Butter Brownie","DESSERT SPATULA","3 DAYS",""),
     it("Walnut Brittle","½ OZ LADLE","4 DAYS","")
   ]},
-
   { title:"GRILL (LINE CHECK)", rows:[
     it("Sanitizer Bucket","Test strips","2 HR",""),
     it("Soybean Oil","Towel, spray bottle","1 DAY",""),
@@ -176,7 +171,6 @@ const CHECKLIST = [
     it("Goat Cheese Slices","","4 DAYS","41°F or less"),
     it("Pesto","Tablespoon","4 DAYS","41°F or less")
   ]},
-
   { title:"STATION 1 (LINE CHECK)", rows:[
     it("Sanitizer Bucket","Test strips","2 HR",""),
     it("Parsley","Shaker","4 HR",""),
@@ -214,7 +208,6 @@ const CHECKLIST = [
     it("Browned Butter","#40 SCOOP","5 DAYS",""),
     it("Cacio e Pepe Ravioli","2 EACH","FROZEN","")
   ]},
-
   { title:"STATION 2 (LINE CHECK)", rows:[
     it("Sanitizer Bucket","Test strips","2 HR",""),
     it("Soybean Oil","1½ OZ LADLE, spray bottle","1 DAY",""),
@@ -261,7 +254,6 @@ const CHECKLIST = [
     it("Shredded Mozzarella","2 OZ SPOODLE","4 DAYS",""),
     it("Liquid Gold Sauce","5 OZ LADLE","4 DAYS","")
   ]},
-
   { title:"ALTO SHAAM / HOT SIDE STEAM WELL", rows:[
     it("Pomodoro (150°)","2 & 4 OZ LADLES","4 HR","150°F"),
     it("Mashed Potatoes (150°)","#8 SCOOP","4 HR","150°F"),
@@ -274,40 +266,26 @@ const CHECKLIST = [
   ]}
 ];
 
-/* ============================
-   STATE
-============================ */
 const state = { am:{}, pm:{} };
 for (const sec of CHECKLIST) {
   state.am[sec.title] = sec.rows.map(r => ({ ...r, done:false, note:"", photo:null }));
   state.pm[sec.title] = sec.rows.map(r => ({ ...r, done:false, note:"", photo:null }));
 }
 
-/* ============================
-   DOM refs (must exist in index.html)
-============================ */
-const sectionsEl = $("#sections");
-const submitBtn = $("#submitBtn");
-const resetShiftBtn = $("#resetShiftBtn");
-const resetAllBtn = $("#resetAllBtn");
-const statusEl = $("#status");
-const pdfIncludeAllEl = $("#pdfIncludeAll");
-const pdfEmbedPhotosEl = $("#pdfEmbedPhotos");
-
-function mustExist(el, id){
-  if (!el) throw new Error(`Missing element with id="${id}" in index.html`);
+function setStatus(msg, ok=null){
+  statusEl.className = "status" + (ok===true ? " ok" : ok===false ? " err" : "");
+  statusEl.textContent = msg;
 }
-mustExist(sectionsEl, "sections");
-mustExist(submitBtn, "submitBtn");
-mustExist(resetShiftBtn, "resetShiftBtn");
-mustExist(resetAllBtn, "resetAllBtn");
-mustExist(statusEl, "status");
-mustExist(pdfIncludeAllEl, "pdfIncludeAll");
-mustExist(pdfEmbedPhotosEl, "pdfEmbedPhotos");
 
-/* ============================
-   RENDER
-============================ */
+function fileToDataUrl(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function render(){
   sectionsEl.innerHTML = "";
 
@@ -322,13 +300,7 @@ function render(){
     const legend = document.createElement("div");
     legend.className = "legend";
     legend.innerHTML = `
-      <div>✔</div>
-      <div>Item</div>
-      <div>Utensil</div>
-      <div>Life</div>
-      <div>Target</div>
-      <div>Note</div>
-      <div>Photo</div>
+      <div>✔</div><div>Item</div><div>Utensil</div><div>Life</div><div>Target</div><div>Note</div><div>Photo</div>
     `;
     card.appendChild(legend);
 
@@ -379,45 +351,25 @@ function render(){
   }
 }
 
-/* ============================
-   TABS
-============================ */
 document.querySelectorAll(".tab").forEach(btn=>{
   btn.addEventListener("click", ()=>{
     document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    shift = btn.dataset.shift;
+    shift = btn.dataset.shift || "am";
     render();
   });
 });
 
-/* ============================
-   RESET
-============================ */
 function resetCurrentShift(){
   if (!confirm(`Reset ${shift.toUpperCase()} shift checklist?`)) return;
-  for (const sec of CHECKLIST) {
-    for (const row of state[shift][sec.title]) {
-      row.done = false;
-      row.note = "";
-      row.photo = null;
-    }
-  }
+  for (const sec of CHECKLIST) for (const row of state[shift][sec.title]) { row.done=false; row.note=""; row.photo=null; }
   render();
 }
 
 function resetAll(){
   if (!confirm("Reset ALL (AM + PM + header fields)?")) return;
 
-  for (const s of ["am","pm"]) {
-    for (const sec of CHECKLIST) {
-      for (const row of state[s][sec.title]) {
-        row.done = false;
-        row.note = "";
-        row.photo = null;
-      }
-    }
-  }
+  for (const s of ["am","pm"]) for (const sec of CHECKLIST) for (const row of state[s][sec.title]) { row.done=false; row.note=""; row.photo=null; }
 
   $("#manager").value = "";
   $("#store").value = "";
@@ -437,32 +389,12 @@ function resetAll(){
 resetShiftBtn.addEventListener("click", resetCurrentShift);
 resetAllBtn.addEventListener("click", resetAll);
 
-/* ============================
-   PDF HELPERS
-============================ */
-function setStatus(msg, ok=null){
-  statusEl.className = "status" + (ok===true ? " ok" : ok===false ? " err" : "");
-  statusEl.textContent = msg;
-}
-
-function fileToDataUrl(file){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/* ============================
-   SUBMIT => PDF (FAST by default)
-============================ */
 submitBtn.addEventListener("click", async ()=>{
   try{
     setStatus("Building PDF…");
 
     const includeAll = pdfIncludeAllEl.checked;
-    const embedPhotos = pdfEmbedPhotosEl.checked; // slow on purpose
+    const embedPhotos = pdfEmbedPhotosEl.checked;
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit:"pt", format:"letter" });
@@ -473,9 +405,7 @@ submitBtn.addEventListener("click", async ()=>{
     const maxW = pageW - margin*2;
     let y = margin;
 
-    const ensure = (h) => {
-      if (y + h > pageH - margin) { doc.addPage(); y = margin; }
-    };
+    const ensure = (h) => { if (y + h > pageH - margin) { doc.addPage(); y = margin; } };
 
     const manager = $("#manager").value || "";
     const store = $("#store").value || "";
@@ -496,31 +426,29 @@ submitBtn.addEventListener("click", async ()=>{
       issues ? `Issues: ${issues}` : ""
     ].filter(Boolean);
 
-    const header = headerParts.join("   |   ");
-    const wrappedHeader = doc.splitTextToSize(header, maxW);
+    const wrappedHeader = doc.splitTextToSize(headerParts.join("   |   "), maxW);
     doc.text(wrappedHeader, margin, y);
     y += wrappedHeader.length * 12 + 10;
 
-    // rows included
-    const rowsToPrint = [];
-    for (const sec of CHECKLIST) {
-      for (const row of state[shift][sec.title]) {
-        const matters = row.done || (row.note && row.note.trim()) || row.photo;
-        if (includeAll || matters) rowsToPrint.push({ sec: sec.title, row });
+    // must have something selected unless includeAll
+    if (!includeAll) {
+      let any = false;
+      for (const sec of CHECKLIST) {
+        for (const row of state[shift][sec.title]) {
+          if (row.done || (row.note && row.note.trim()) || row.photo) { any = true; break; }
+        }
+        if (any) break;
       }
-    }
-
-    if (!rowsToPrint.length) {
-      setStatus("Nothing marked. Check at least one item (or add a note/photo) to generate a PDF.", false);
-      return;
+      if (!any) { setStatus("Nothing marked. Check at least one item (or add a note/photo).", false); return; }
     }
 
     let photoCount = 0;
+
     for (const sec of CHECKLIST) {
       const secRows = state[shift][sec.title].filter(r => includeAll || r.done || (r.note && r.note.trim()) || r.photo);
       if (!secRows.length) continue;
 
-      ensure(24);
+      ensure(26);
       doc.setFont("helvetica","bold"); doc.setFontSize(12);
       doc.text(sec.title, margin, y); y += 14;
 
@@ -529,26 +457,22 @@ submitBtn.addEventListener("click", async ()=>{
       y += 12;
 
       for (const row of secRows) {
-        const photoFlag = row.photo ? "YES" : "NO";
         const prefix = row.done ? "✅" : "⬜";
-
-        const line =
-          `${prefix} | ${row.item} | ${row.utensil || "—"} | ${row.life || "—"} | ${row.target || "—"} | ${row.note || ""} | ${photoFlag}`;
-
+        const photoFlag = row.photo ? "YES" : "NO";
+        const line = `${prefix} | ${row.item} | ${row.utensil || "—"} | ${row.life || "—"} | ${row.target || "—"} | ${row.note || ""} | ${photoFlag}`;
         const lines = doc.splitTextToSize(line, maxW);
+
         ensure(lines.length * 12 + 6);
         doc.text(lines, margin, y);
         y += lines.length * 12 + 2;
 
         if (embedPhotos && row.photo) {
           photoCount++;
-          setStatus(`Embedding photo ${photoCount}… (this is slow by design)`);
+          setStatus(`Embedding photo ${photoCount}… (slow)`);
           const dataUrl = await fileToDataUrl(row.photo);
-
-          ensure(140);
+          ensure(150);
           doc.setFont("helvetica","italic"); doc.setFontSize(9);
-          doc.text("Photo:", margin, y);
-          y += 10;
+          doc.text("Photo:", margin, y); y += 10;
           doc.addImage(dataUrl, "JPEG", margin, y, 200, 140);
           y += 150;
           doc.setFont("helvetica","normal"); doc.setFontSize(9);
@@ -560,16 +484,13 @@ submitBtn.addEventListener("click", async ()=>{
 
     const safeStore = (store || "Store").replace(/[^a-z0-9]+/gi,"-");
     doc.save(`LineCheck-${shift.toUpperCase()}-${safeStore}-${date || "date"}.pdf`);
-
     setStatus("PDF downloaded.", true);
   } catch (e) {
     setStatus(`PDF Error: ${e?.message || e}`, false);
+    showDebug(`<b>PDF Error:</b> ${e?.message || e}`);
   }
 });
 
-/* ============================
-   INIT (wait for DOM)
-============================ */
 window.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
   $("#date").value = now.toISOString().slice(0,10);
