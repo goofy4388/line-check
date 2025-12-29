@@ -9,21 +9,24 @@
 <body>
 
 <header class="top">
-  <div>
-    <h1>Daily Kitchen Execution (Line Check)</h1>
-    <p class="sub">1 checkbox per item + keep utensil/life/target temp + notes/photos. Submit downloads PDF.</p>
-  </div>
+  <div class="headRow">
+    <div>
+      <h1>Daily Kitchen Execution (Line Check)</h1>
+      <p class="sub">One checkbox per item + keep utensil/life/target + notes/photos. Fast PDF.</p>
+    </div>
 
-  <div class="tabs">
-    <button class="tab active" data-shift="am" type="button">AM Shift</button>
-    <button class="tab" data-shift="pm" type="button">PM Shift</button>
+    <div class="tabs">
+      <button class="tab active" data-shift="am" type="button">AM</button>
+      <button class="tab" data-shift="pm" type="button">PM</button>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
+
   <section class="meta">
     <div class="field">
-      <label>Manager Name</label>
+      <label>Manager</label>
       <input id="manager" placeholder="Manager name" />
     </div>
     <div class="field">
@@ -42,13 +45,25 @@
 
   <section class="meta">
     <div class="field">
-      <label>Equipment Temps / Notes (optional)</label>
-      <input id="equipNotes" placeholder='Example: Fryer 355°F, cooler 38°F, freezer -2°F…' />
+      <label>Equipment Temps (optional)</label>
+      <input id="equipNotes" placeholder="Example: Fryer 350°, salad cooler 38°, freezer -2°" />
     </div>
     <div class="field">
       <label>Issues / Follow-up (optional)</label>
-      <input id="issues" placeholder="Example: Station 2 cooler thermometer missing" />
+      <input id="issues" placeholder="Example: Station 2 thermometer missing" />
     </div>
+  </section>
+
+  <section class="options">
+    <label class="opt">
+      <input id="pdfIncludeAll" type="checkbox" />
+      Include ALL items in PDF (slower + longer)
+    </label>
+
+    <label class="opt">
+      <input id="pdfEmbedPhotos" type="checkbox" />
+      Embed photos into PDF (VERY slow)
+    </label>
   </section>
 
   <div id="sections"></div>
@@ -62,8 +77,9 @@
     </div>
 
     <div id="status" class="status"></div>
-    <p class="hint">iPhone: PDF opens → Share → Save to Files.</p>
+    <p class="hint">iPhone: PDF opens → Share → Save to Files. Add to Home Screen for “app” feel.</p>
   </section>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
