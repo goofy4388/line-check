@@ -1,12 +1,79 @@
-{
-  "name": "line-check",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.19.2"
-  }
-}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BBI Internal Checklist</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+<header class="top">
+  <div class="headRow">
+    <div>
+      <h1>BBI Internal Checklist</h1>
+      <p class="sub">1 checkbox per item + note/photo. Submit downloads PDF.</p>
+    </div>
+
+    <nav class="navLinks">
+      <a class="navLink" href="index.html">Line Check</a>
+      <a class="navLink active" href="bbi.html">BBI Internal</a>
+    </nav>
+
+    <div class="tabs">
+      <button class="tab active" data-shift="am" type="button">AM</button>
+      <button class="tab" data-shift="pm" type="button">PM</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="meta">
+    <div class="field">
+      <label>Manager</label>
+      <input id="manager" placeholder="Manager name" />
+    </div>
+    <div class="field">
+      <label>Store</label>
+      <input id="store" placeholder="Store / Location" />
+    </div>
+    <div class="field">
+      <label>Date</label>
+      <input id="date" type="date" />
+    </div>
+    <div class="field">
+      <label>Time</label>
+      <input id="time" type="time" />
+    </div>
+  </section>
+
+  <section class="options">
+    <label class="opt">
+      <input id="pdfIncludeAll" type="checkbox" />
+      Include ALL items in PDF
+    </label>
+    <label class="opt">
+      <input id="pdfEmbedPhotos" type="checkbox" />
+      Embed photos into PDF (slow)
+    </label>
+  </section>
+
+  <div id="debug" class="debug" aria-live="polite"></div>
+  <div id="sections"></div>
+
+  <section class="submitBox">
+    <button id="submitBtn" type="button">Submit & Download PDF</button>
+
+    <div class="btnRow">
+      <button id="resetShiftBtn" type="button">Reset Current Shift</button>
+      <button id="resetAllBtn" type="button" class="danger">Reset ALL</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="bbi.js"></script>
+</body>
+</html>
