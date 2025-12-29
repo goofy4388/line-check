@@ -7,7 +7,55 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+<body>
 
+  <!-- HEADER / FORM -->
+  <h1>Daily Kitchen Execution (Line Check)</h1>
+
+  <div class="tabs">
+    <button class="tab active" data-shift="am">AM</button>
+    <button class="tab" data-shift="pm">PM</button>
+  </div>
+
+  <div class="form">
+    <input id="manager" placeholder="Manager name">
+    <input id="store" placeholder="Store / Location">
+    <input id="date" type="date">
+    <input id="time" type="time">
+
+    <input id="equipNotes" placeholder="Equipment Temps (optional)">
+    <input id="issues" placeholder="Issues / Follow-up (optional)">
+  </div>
+
+  <!-- ✅ THIS IS REQUIRED -->
+  <div id="sections"></div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="actions">
+    <button id="submitBtn">Submit & Download PDF</button>
+    <button id="resetShiftBtn">Reset Shift</button>
+    <button id="resetAllBtn">Reset ALL</button>
+  </div>
+
+  <div class="options">
+    <label>
+      <input type="checkbox" id="pdfIncludeAll">
+      Include ALL items in PDF
+    </label>
+
+    <label>
+      <input type="checkbox" id="pdfEmbedPhotos">
+      Embed photos into PDF (slow)
+    </label>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <!-- ✅ SCRIPTS MUST BE LAST -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+
+</body>
 <header class="top">
   <div class="headRow">
     <div>
