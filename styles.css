@@ -110,3 +110,11 @@ button{
 .status{ margin-top:10px; font-size:13px; }
 .status.ok{ color:#55dd88; }
 .status.err{ color:#ff5b5b; }
+/* Magical sparkle overlay */
+#pixieDust{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;         /* raise/lower if needed */
+  opacity: 0.85;
+}
