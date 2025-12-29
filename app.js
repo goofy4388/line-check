@@ -1,11 +1,5 @@
-const sectionsEl = $("#sections");
-
-if (!sectionsEl) {
-  alert("ERROR: <div id='sections'> not found or JS loaded too early");
-
-}
 /* =========================================================
-   DAILY KITCHEN EXECUTION (LINE CHECK) - PERFECT VERSION
+   DAILY KITCHEN EXECUTION (LINE CHECK) - FIXED VERSION
    - AM/PM tabs
    - 1 checkbox per item (Executed)
    - Shows: Item + Utensil + Shelf Life + Target Temp
@@ -16,17 +10,9 @@ if (!sectionsEl) {
 
 const $ = (s) => document.querySelector(s);
 
-const sectionsEl = $("#sections");
-const submitBtn = $("#submitBtn");
-const resetShiftBtn = $("#resetShiftBtn");
-const resetAllBtn = $("#resetAllBtn");
-const statusEl = $("#status");
-const pdfIncludeAllEl = $("#pdfIncludeAll");
-const pdfEmbedPhotosEl = $("#pdfEmbedPhotos");
-
 let shift = "am";
 
-const it = (item, utensil="", life="", target="") => ({ item, utensil, life, target });
+const it = (item, utensil = "", life = "", target = "") => ({ item, utensil, life, target });
 
 /* ============================
    FULL CHECKLIST (from your sheets)
@@ -285,6 +271,28 @@ for (const sec of CHECKLIST) {
 }
 
 /* ============================
+   DOM refs (must exist in index.html)
+============================ */
+const sectionsEl = $("#sections");
+const submitBtn = $("#submitBtn");
+const resetShiftBtn = $("#resetShiftBtn");
+const resetAllBtn = $("#resetAllBtn");
+const statusEl = $("#status");
+const pdfIncludeAllEl = $("#pdfIncludeAll");
+const pdfEmbedPhotosEl = $("#pdfEmbedPhotos");
+
+function mustExist(el, id){
+  if (!el) throw new Error(`Missing element with id="${id}" in index.html`);
+}
+mustExist(sectionsEl, "sections");
+mustExist(submitBtn, "submitBtn");
+mustExist(resetShiftBtn, "resetShiftBtn");
+mustExist(resetAllBtn, "resetAllBtn");
+mustExist(statusEl, "status");
+mustExist(pdfIncludeAllEl, "pdfIncludeAll");
+mustExist(pdfEmbedPhotosEl, "pdfEmbedPhotos");
+
+/* ============================
    RENDER
 ============================ */
 function render(){
@@ -402,17 +410,16 @@ function resetAll(){
   $("#store").value = "";
   $("#equipNotes").value = "";
   $("#issues").value = "";
-/* ============================
-   INIT (wait for DOM)
-============================ */
-window.addEventListener("DOMContentLoaded", () => {
+
   const now = new Date();
   $("#date").value = now.toISOString().slice(0,10);
   $("#time").value = now.toTimeString().slice(0,5);
-  render();
-});
-  
 
+  pdfIncludeAllEl.checked = false;
+  pdfEmbedPhotosEl.checked = false;
+
+  render();
+}
 
 resetShiftBtn.addEventListener("click", resetCurrentShift);
 resetAllBtn.addEventListener("click", resetAll);
@@ -464,7 +471,6 @@ submitBtn.addEventListener("click", async ()=>{
     const equipNotes = $("#equipNotes").value || "";
     const issues = $("#issues").value || "";
 
-    // Header
     doc.setFont("helvetica","bold"); doc.setFontSize(15);
     doc.text(`Daily Kitchen Execution — ${shift.toUpperCase()}`, margin, y); y += 18;
 
@@ -482,7 +488,7 @@ submitBtn.addEventListener("click", async ()=>{
     doc.text(wrappedHeader, margin, y);
     y += wrappedHeader.length * 12 + 10;
 
-    // Count “included” rows to show progress
+    // rows included
     const rowsToPrint = [];
     for (const sec of CHECKLIST) {
       for (const row of state[shift][sec.title]) {
@@ -496,10 +502,8 @@ submitBtn.addEventListener("click", async ()=>{
       return;
     }
 
-    // Print sections
     let photoCount = 0;
     for (const sec of CHECKLIST) {
-      // collect rows for this section
       const secRows = state[shift][sec.title].filter(r => includeAll || r.done || (r.note && r.note.trim()) || r.photo);
       if (!secRows.length) continue;
 
@@ -523,7 +527,6 @@ submitBtn.addEventListener("click", async ()=>{
         doc.text(lines, margin, y);
         y += lines.length * 12 + 2;
 
-        // Optional: embed photo (slow by design)
         if (embedPhotos && row.photo) {
           photoCount++;
           setStatus(`Embedding photo ${photoCount}… (this is slow by design)`);
@@ -552,11 +555,11 @@ submitBtn.addEventListener("click", async ()=>{
 });
 
 /* ============================
-   INIT
+   INIT (wait for DOM)
 ============================ */
-(() => {
+window.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
   $("#date").value = now.toISOString().slice(0,10);
   $("#time").value = now.toTimeString().slice(0,5);
   render();
-})();
+});
