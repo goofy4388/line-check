@@ -8,13 +8,17 @@
 </head>
 
 <body>
-
 <header class="top">
   <div class="headRow">
     <div>
       <h1>Daily Kitchen Execution (Line Check)</h1>
-      <p class="sub">One checkbox per item + keep utensil/life/target + notes/photos. Fast PDF.</p>
+      <p class="sub">1 checkbox per item + utensil/life/target + note/photo. Submit downloads PDF.</p>
     </div>
+
+    <nav class="navLinks">
+      <a class="navLink active" href="index.html">Line Check</a>
+      <a class="navLink" href="bbi.html">BBI Internal</a>
+    </nav>
 
     <div class="tabs">
       <button class="tab active" data-shift="am" type="button">AM</button>
@@ -24,7 +28,6 @@
 </header>
 
 <main class="wrap">
-
   <section class="meta">
     <div class="field">
       <label>Manager</label>
@@ -58,18 +61,16 @@
   <section class="options">
     <label class="opt">
       <input id="pdfIncludeAll" type="checkbox" />
-      Include ALL items in PDF (slower + longer)
+      Include ALL items in PDF
     </label>
-
     <label class="opt">
       <input id="pdfEmbedPhotos" type="checkbox" />
-      Embed photos into PDF (VERY slow)
+      Embed photos into PDF (slow)
     </label>
   </section>
 
-  <!-- ✅ ONLY ONE sections div -->
-<div id="debug" style="margin:12px 0; padding:12px; border:1px solid #ff5b5b; border-radius:12px; display:none;"></div>
-    <div id="sections"></div>
+  <div id="debug" class="debug" aria-live="polite"></div>
+  <div id="sections"></div>
 
   <section class="submitBox">
     <button id="submitBtn" type="button">Submit & Download PDF</button>
@@ -80,14 +81,11 @@
     </div>
 
     <div id="status" class="status"></div>
-    <p class="hint">iPhone: PDF opens → Share → Save to Files. Add to Home Screen for “app” feel.</p>
+    <p class="hint">iPhone: PDF opens → Share → Save to Files.</p>
   </section>
-
 </main>
 
-<!-- ✅ scripts last -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="app.js"></script>
-
 </body>
 </html>
