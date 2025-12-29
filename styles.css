@@ -110,3 +110,29 @@ button{
 .status{ margin-top:10px; font-size:13px; }
 .status.ok{ color:#55dd88; }
 .status.err{ color:#ff5b5b; }
+/* Mobile friendliness: stack columns on small screens */
+@media (max-width: 900px){
+  .legend{ display:none; } /* legend too wide on phones */
+  .row{
+    grid-template-columns: 40px 1fr; /* checkbox + main area */
+    gap:10px;
+    padding:12px 0;
+  }
+
+  /* make the "extra fields" wrap nicely under the item */
+  .row .muted,
+  .row .note,
+  .row .photo{
+    grid-column: 2 / -1;
+  }
+
+  .itemText{
+    font-size:14px;
+    font-weight:600;
+  }
+}
+
+/* Make file input behave nicer on iPhone */
+.photo{
+  width:100%;
+}
