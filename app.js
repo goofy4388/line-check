@@ -1,3 +1,16 @@
+const $ = (s) => document.querySelector(s);
+
+function showDebug(msg) {
+  const d = document.getElementById("debug");
+  if (d) {
+    d.style.display = "block";
+    d.innerHTML = msg;
+  }
+}
+
+window.addEventListener("error", (e) => {
+  showDebug(`<b>JS ERROR:</b> ${e.message || e}<br><small>${e.filename || ""} : ${e.lineno || ""}</small>`);
+});
 /* =========================================================
    DAILY KITCHEN EXECUTION (LINE CHECK) - FIXED VERSION
    - AM/PM tabs
