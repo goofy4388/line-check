@@ -1,3 +1,112 @@
+// ===== Magical "fairy dust" fly-through (original, not a character) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.getElementById("pixieDust");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  let W = canvas.width = window.innerWidth;
+  let H = canvas.height = window.innerHeight;
+
+  const particles = [];
+  const MAX = 120;          // more = more sparkles
+  const SPEED = 1.6;        // fairy speed
+  const TRAIL = 0.12;       // lower = longer trail (0.06–0.18)
+  const GLOW = 14;          // glow size
+
+  // "Fairy" position
+  let t = 0;
+  let fx = -80;
+  let fy = H * 0.35;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+
+  function spawnSparkle(x, y) {
+    if (particles.length > MAX) particles.shift();
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      life: 1,
+      r: 1.2 + Math.random() * 2.6
+    });
+  }
+
+  function drawSparkle(p) {
+    const alpha = Math.max(0, p.life);
+    ctx.globalAlpha = alpha;
+
+    // glow
+    ctx.shadowBlur = GLOW;
+    ctx.shadowColor = "rgba(255,255,255,0.9)";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fill();
+
+    // tiny star cross
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(p.x - p.r*2, p.y);
+    ctx.lineTo(p.x + p.r*2, p.y);
+    ctx.moveTo(p.x, p.y - p.r*2);
+    ctx.lineTo(p.x, p.y + p.r*2);
+    ctx.stroke();
+  }
+
+  function loop() {
+    // fade previous frame for trail
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = `rgba(0,0,0,${TRAIL})`;
+    ctx.fillRect(0, 0, W, H);
+
+    // Move the "fairy" in a gentle wave across screen
+    t += 0.02;
+    fx += SPEED;
+    fy = H * 0.35 + Math.sin(t * 1.2) * (H * 0.08) + Math.sin(t * 2.4) * (H * 0.03);
+
+    // wrap
+    if (fx > W + 80) {
+      fx = -80;
+      t = 0;
+    }
+
+    // spawn sparkles along the path
+    for (let i = 0; i < 3; i++) {
+      spawnSparkle(fx - i * 8, fy + (Math.random() - 0.5) * 10);
+    }
+
+    // update + draw particles
+    ctx.clearRect(0, 0, 0, 0); // no-op; keep for clarity
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 0.02;
+
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+        i--;
+        continue;
+      }
+      drawSparkle(p);
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  // initialize with transparent frame (don’t black out your page)
+  ctx.clearRect(0, 0, W, H);
+  // Make canvas transparent by not painting a background—trail fade uses black; adjust with overlay below:
+  // If you want no darkening at all, set TRAIL to 0 and remove the fillRect above.
+
+  loop();
+});
 const sectionsEl = $("#sections");
 
 if (!sectionsEl) {
